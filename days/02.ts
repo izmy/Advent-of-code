@@ -5,33 +5,40 @@ const day2 = (input: string[]) => {
   let validPasswordB = 0;
 
   for (const line of input) {
+    if (line.length === 0) break;
     const [rule, char, password] = line.split(" ");
     const [minLength, maxLength] = rule.split("-").map(Number);
     const validLetter = char[0];
 
-    const sumOfLetter = Array.from(password).reduce((accumulator, currentValue) => currentValue === validLetter ? ++accumulator : accumulator, 0)
+    const sumOfLetter = Array.from(password).reduce(
+      (accumulator, currentValue) =>
+        currentValue === validLetter ? ++accumulator : accumulator,
+      0
+    );
 
     if (minLength <= sumOfLetter && sumOfLetter <= maxLength) {
       validPasswordA++;
     }
 
     if (
-      password[minLength - 1] === validLetter && password[maxLength - 1] !== validLetter ||
-      password[maxLength - 1] === validLetter && password[minLength - 1] !== validLetter
+      (password[minLength - 1] === validLetter &&
+        password[maxLength - 1] !== validLetter) ||
+      (password[maxLength - 1] === validLetter &&
+        password[minLength - 1] !== validLetter)
     ) {
       validPasswordB++;
     }
   }
 
   return {
-    validPasswordA,
-    validPasswordB
+    part1: validPasswordA,
+    part2: validPasswordB,
   };
-}
+};
 
 const testInput = getPuzzleInputFile("02");
 console.log(day2(testInput));
 
-getPuzzleInputApi(2).then(input => {
-  console.log(day2(input))
+getPuzzleInputApi(2).then((input) => {
+  console.log(day2(input));
 });
