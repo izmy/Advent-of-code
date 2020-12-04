@@ -11,7 +11,8 @@ export const getPuzzleInputApi = async (day: number) => {
     },
   });
   const input = await result.text();
-  const inputInArray = await input.split('\n').filter(line => line.indexOf(' ') >= 0);
+  // const inputInArray = await input.split('\n').filter(line => line.indexOf(' ') >= 0);
+  const inputInArray = await input.split('\n');
 
   return inputInArray;
 };
