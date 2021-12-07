@@ -4,8 +4,8 @@ import fetch from "node-fetch";
 
 dotenv.config();
 
-export const getPuzzleInputApi = async (day: number) => {
-  const result = await fetch(`https://adventofcode.com/2020/day/${day}/input`, {
+export const getPuzzleInputApi = async (day: number, year: number = 2020) => {
+  const result = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
     headers: {
       Cookie: process.env.COOKIE,
     },
@@ -20,8 +20,8 @@ export const getPuzzleInputApi = async (day: number) => {
   return inputInArray;
 };
 
-export const getPuzzleInputFile = (day: string) => {
-  const input = fs.readFileSync(`days/${day}-test.txt`, "utf-8");
+export const getPuzzleInputFile = (day: string, year: number = 2020) => {
+  const input = fs.readFileSync(`${year}/${day}-test.txt`, "utf-8");
   const inputInArray = input.split("\n");
 
   if (input[input.length - 1] === "\n") {

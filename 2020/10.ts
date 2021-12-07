@@ -1,23 +1,15 @@
 import { getPuzzleInputApi, getPuzzleInputFile } from "..";
 
 const findAllCombinations = (adapters, charginOutlet, done) => {
-  console.log("charginOutlet", charginOutlet);
-  if (adapters.length < 1) {
-    console.log(done);
+  if (adapters.length <= 2) {
     return done;
   }
 
-  if (
-    adapters[0] === charginOutlet + 1 &&
-    adapters[0] === charginOutlet + 2 &&
-    adapters[0] === charginOutlet + 3
-  ) {
-    return (
-      findAllCombinations(adapters.slice(1), charginOutlet + 1, done + 3) +
-      findAllCombinations(adapters.slice(1), charginOutlet + 2, done + 3) +
-      findAllCombinations(adapters.slice(1), charginOutlet + 3, done + 3)
-    );
-  }
+  return (
+    findAllCombinations(adapters.slice(1), charginOutlet + 1, done + 3) +
+    findAllCombinations(adapters.slice(1), charginOutlet + 2, done + 3) +
+    findAllCombinations(adapters.slice(1), charginOutlet + 3, done + 3)
+  );
 };
 
 const day10 = (input: string[]) => {
@@ -31,7 +23,6 @@ const day10 = (input: string[]) => {
   console.log(adapters);
 
   for (const adapterValue of adapters) {
-    // console.log(`chargingOutlet: ${chargingOutlet}, adapterValue: ${adapterValue}`);
     const diff = adapterValue - chargingOutlet;
     console.log(diff);
     if (diff === 1) {
@@ -48,7 +39,7 @@ const day10 = (input: string[]) => {
   increment[3]++;
 
   const allCombinations = findAllCombinations(adapters, 0, 0);
-  // console.log(allCombinations);
+  console.log(allCombinations);
 
   return {
     part1: increment[1] * increment[3],
