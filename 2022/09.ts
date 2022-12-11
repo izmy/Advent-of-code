@@ -2,92 +2,91 @@ import { getPuzzleInputApi, getPuzzleInputFile } from "../index";
 
 type Position = "U" | "R" | "D" | "L";
 
-interface Step {
-  position: Position;
-  size: number;
-}
+class Knot {
+  x: number;
+  y: number;
+  visited: Set<string>;
 
-const moving = (x: number, y: number, position: Position): [number, number] => {
-  switch (position) {
-    case "L":
-      return [x - 1, y];
-    case "R":
-      return [x + 1, y];
-    case "U":
-      return [x, y + 1];
-    case "D":
-      return [x, y - 1];
-    default:
-      return [x, y];
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    this.visited = new Set();
+    this.visit();
   }
-};
 
-const day9 = (input: string[]) => {
-  const steps = [] as Step[];
-
-  const moves = [{ head: [0, 0], tail: [0, 0] }];
-
-  for (let i = 0; i < input.length; i++) {
-    const [position, sizeRaw] = input[i].split(" ") as [Position, string];
-    const size = parseInt(sizeRaw);
-    const step = { position, size };
-    steps.push(step);
-
-    let head = moves[moves.length - 1].head;
-    let tail = moves[moves.length - 1].tail;
-
-    for (let j = 0; j < size; j++) {
-      // console.log({ head, tail });
-      if (head[0] < tail[0] && head[1] === tail[1]) {
-        if (position === "L") {
-          tail = moving(tail[0], tail[1], position);
-        }
-      } else if (head[0] > tail[0] && head[1] === tail[1]) {
-        if (position === "R") {
-          tail = moving(tail[0], tail[1], position);
-        }
-      } else if (head[0] === tail[0] && head[1] < tail[1]) {
-        if (position === "D") {
-          tail = moving(tail[0], tail[1], position);
-        }
-      } else if (head[0] === tail[0] && head[1] > tail[1]) {
-        if (position === "U") {
-          tail = moving(tail[0], tail[1], position);
-        }
-      } else if (head[0] === tail[0] && head[1] === tail[1]) {
-      } else if (head[0] > tail[0] && head[1] > tail[1]) {
-        if (position === "U" || position === "R") {
-          tail = moving(tail[0], tail[1], "U");
-          tail = moving(tail[0], tail[1], "R");
-        }
-      } else if (head[0] > tail[0] && head[1] < tail[1]) {
-        if (position === "D" || position === "R") {
-          tail = moving(tail[0], tail[1], "D");
-          tail = moving(tail[0], tail[1], "R");
-        }
-      } else if (head[0] < tail[0] && head[1] > tail[1]) {
-        if (position === "L" || position === "U") {
-          tail = moving(tail[0], tail[1], "U");
-          tail = moving(tail[0], tail[1], "L");
-        }
-      } else if (head[0] < tail[0] && head[1] < tail[1]) {
-        if (position === "L" || position === "D") {
-          tail = moving(tail[0], tail[1], "D");
-          tail = moving(tail[0], tail[1], "L");
-        }
-      }
-
-      head = moving(head[0], head[1], position);
-      moves.push({ head, tail });
+  move(position: Position) {
+    switch (position) {
+      case "L":
+        this.x--;
+        break;
+      case "R":
+        this.x++;
+        break;
+      case "U":
+        this.y++;
+        break;
+      case "D":
+        this.y--;
+        break;
+      default:
     }
   }
 
-  console.log(moves);
-  const part1 = new Set(moves.map(move => move.tail.toString())).size;
+  visit() {
+    this.visited.add(`[${this.x},${this.y}]`);
+  }
+}
+
+const changeFollowedPosition = (main: Knot, followed: Knot) => {
+  const distance = Math.max(Math.abs(main.x - followed.x), Math.abs(main.y - followed.y));
+  if (distance > 1) {
+    const directionX = main.x - followed.x;
+    if (directionX > 0) {
+      followed.move("R");
+    } else if (directionX < 0) {
+      followed.move("L");
+    }
+    const directionY = main.y - followed.y;
+    if (directionY > 0) {
+      followed.move("U");
+    } else if (directionY < 0) {
+      followed.move("D");
+    }
+  }
+
+  main.visit();
+  followed.visit();
+};
+
+const day9 = (input: string[]) => {
+  const head = new Knot(0, 0);
+  const tail = new Knot(0, 0);
+  const knots = Array.from(Array(10), _ => new Knot(0, 0));
+
+  for (let i = 0; i < input.length; i++) {
+    const [position, steps] = input[i].split(" ") as [Position, string];
+
+    // part1
+    for (let j = 0; j < parseInt(steps); j++) {
+      head.move(position);
+      changeFollowedPosition(head, tail);
+    }
+
+    // part2
+    for (let j = 0; j < parseInt(steps); j++) {
+      knots[0].move(position);
+      for (let k = 0; k < knots.length - 1; k++) {
+        changeFollowedPosition(knots[k], knots[k + 1]);
+      }
+    }
+  }
+
+  const part1 = tail.visited.size;
+  const part2 = knots.map(knot => knot.visited.size)[knots.length - 1];
 
   return {
     part1,
-    part2: null,
+    part2,
   };
 };
 
