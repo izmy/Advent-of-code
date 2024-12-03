@@ -1,15 +1,11 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as dotenv from "dotenv";
-import fetch from "node-fetch";
-import { HeadersInit } from "node-fetch";
 
 dotenv.config();
 
-export const getPuzzleInputApi = async (day: number, year: number = 2020) => {
+export const getPuzzleInputApi = async (day: number, year = 2020) => {
   const result = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
-    headers: {
-      Cookie: process.env.COOKIE,
-    } as HeadersInit,
+    headers: new Headers(process.env.COOKIE ? { Cookie: process.env.COOKIE } : undefined),
   });
   const input = await result.text();
   const inputInArray = await input.split("\n");
@@ -21,7 +17,7 @@ export const getPuzzleInputApi = async (day: number, year: number = 2020) => {
   return inputInArray;
 };
 
-export const getPuzzleInputFile = (day: string, year: number = 2020) => {
+export const getPuzzleInputFile = (day: string, year = 2020) => {
   const input = fs.readFileSync(`${year}/${day}-test.txt`, "utf-8");
   const inputInArray = input.split("\n");
 
